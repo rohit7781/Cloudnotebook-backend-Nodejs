@@ -4,13 +4,14 @@ const router = express.Router()
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 var jwt = require('jsonwebtoken');
-var token = jwt.sign({ foo: 'bar' }, 'shhhhh');
+const fetchuser = require('../middleware/fetchuser');
 
-// Creating my own secret key for verification . No login required
+
+// Creating my own secret key for verification 
 JWT_SECRET = "my$&*@$Rohit&&"
 
 
-// Create a user using = POTS : /api/auth/createuser
+// Create a user using = POTS : /api/auth/createuser . No login required
 router.post('/createuser',[
     body('name','Enter a valid name').isLength({ min: 3 }),
     body('email','Enter a valid email').isEmail(),
@@ -98,9 +99,20 @@ router.post('/login',[
     }
     
 } )
+// Get user login data = POTS : /api/auth/getuer .login required
+router.post('/getuser',fetchuser,async (req, res)=>{
 
+try {
+    userId = req.user.id;   
+    const user = await User.findById(userId).select("-password")
+    res.send(user);
 
+} catch (error) {
+    console.error(error.message);
+        res.status(500).send("Internal server error occurs")
+}
 
+})
 
 
 module.exports = router
