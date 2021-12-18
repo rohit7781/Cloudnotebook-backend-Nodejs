@@ -3,6 +3,11 @@ const User = require('../models/User');
 const router = express.Router()
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
+var jwt = require('jsonwebtoken');
+var token = jwt.sign({ foo: 'bar' }, 'shhhhh');
+
+// Creating my own secret key for verification
+JWT_SECRET = "my$&*@$Rohit&&"
 
 
 // Create a user using = POTS : /api/auth/createuser
@@ -26,15 +31,25 @@ router.post('/createuser',[
     }
 
     const salt = await bcrypt.genSalt(10)
-
     secPass = await bcrypt.hash(req.body.password,salt) ;
+
+    // Creating a new user
     user = await User.create({
         name: req.body.name,
         email: req.body.email,
         password: secPass,
       })
+    const data = {
+        user :{
+            id : user.id
+        }
+    }
       
-    res.json(user);
+    const authtoken = jwt.sign(data,JWT_SECRET)
+
+
+    res.json(authtoken);
+
     } catch (error) {
         console.error(error.message);
         res.status(500).send("some error occurs")
