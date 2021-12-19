@@ -11,7 +11,7 @@ const fetchuser = require('../middleware/fetchuser');
 JWT_SECRET = "my$&*@$Rohit&&"
 
 
-// Create a user using = POTS : /api/auth/createuser . No login required
+//Route 1 : Create a user using = POTS : /api/auth/createuser . No login required
 router.post('/createuser',[
     body('name','Enter a valid name').isLength({ min: 3 }),
     body('email','Enter a valid email').isEmail(),
@@ -59,7 +59,7 @@ router.post('/createuser',[
 
 
 
-// Authenticate a user using = POTS : /api/auth/login No login required
+//Route 2 : Authenticate a user using = POTS : /api/auth/login No login required
 router.post('/login',[
     body('email','Enter a valid email').isEmail(),
     body('password','Enter your password please').exists(),
@@ -99,7 +99,7 @@ router.post('/login',[
     }
     
 } )
-// Get user login data = POTS : /api/auth/getuer .login required
+//Route 3 : Get user login data = POTS : /api/auth/getuer .login required
 router.post('/getuser',fetchuser,async (req, res)=>{
 
 try {
