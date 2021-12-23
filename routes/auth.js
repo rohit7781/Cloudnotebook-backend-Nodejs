@@ -91,9 +91,9 @@ router.post('/login',[
                 id : user.id
             }
         }
-        success = true;
         const authtoken = jwt.sign(data,JWT_SECRET)
-        res.json(authtoken);
+        success = true;
+        res.json({success,authtoken});
     
 
     } catch (error) {
