@@ -64,7 +64,7 @@ router.post('/login',[
     body('email','Enter a valid email').isEmail(),
     body('password','Enter your password please').exists(),
 ],async (req, res)=>{
-
+    let success = false;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -74,6 +74,7 @@ router.post('/login',[
     try {
         let user = await User.findOne({email});
         if (!user) {
+            success = false;
             return res.status(400).json({
                 error: "Sorry user doesn't exits"
             });
@@ -81,6 +82,7 @@ router.post('/login',[
 
         const passwordcompare = await bcrypt.compare(password,user.password)
         if (!passwordcompare) {
+            success = false;
             return res.status(400).json({error:"Enter correct password"});
         }
 
@@ -89,6 +91,7 @@ router.post('/login',[
                 id : user.id
             }
         }
+        success = true;
         const authtoken = jwt.sign(data,JWT_SECRET)
         res.json(authtoken);
     
