@@ -13,21 +13,22 @@ JWT_SECRET = "my$&*@$Rohit&&"
 
 //Route 1 : Create a user using = POTS : /api/auth/createuser . No login required
 router.post('/createuser',[
-    body('name','Enter a valid name').isLength({ min: 3 }),
-    body('email','Enter a valid email').isEmail(),
-    body('password','Password must be more than 5  character').isLength({ min: 5 }),
+    body('name','Name cannot be blank').isLength({ min: 3 }),
+    body('email','Email cannot be blank').isEmail(),
+    body('password','Password must be more than 6 character').isLength({ min: 5 }),
 
 ],async (req, res)=>{
-
+    let success = false;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ error:"All fields are compulsary" });
     }
     try {
         
     
     let user = await User.findOne({email:req.body.email});
     if (user) {
+        success = false;
         return res.status(400).json({error:"Email already registered"})
     }
 
@@ -45,11 +46,10 @@ router.post('/createuser',[
             id : user.id
         }
     }
-      
+          
     const authtoken = jwt.sign(data,JWT_SECRET)
-
-
-    res.json(authtoken);
+    success = true;
+    res.json({success,authtoken});
 
     } catch (error) {
         console.error(error.message);
@@ -67,7 +67,7 @@ router.post('/login',[
     let success = false;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ error: "Email or password cannot be blank." });
     }
 
     const {email,password} = req.body;
@@ -76,14 +76,14 @@ router.post('/login',[
         if (!user) {
             success = false;
             return res.status(400).json({
-                error: "Sorry user doesn't exits"
+                error: "User doesn't exits kindly Signup."
             });
         }
 
         const passwordcompare = await bcrypt.compare(password,user.password)
         if (!passwordcompare) {
             success = false;
-            return res.status(400).json({error:"Enter correct password"});
+            return res.status(400).json({error:"Your password is Incorrect."});
         }
 
         const data = {
